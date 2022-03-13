@@ -1,0 +1,42 @@
+---
+- name: Tailscale
+  hosts: raspberry
+  vars_files: ./vars/global.yaml
+  become: yes
+  tasks:
+    - name: Install apt-transport-https
+      ansible.builtin.apt:
+        pkg:
+          - apt-transport-https
+    - name: Package signing key
+      ansible.builtin.apt_key:
+        url: https://pkgs.tailscale.com/stable/raspbian/buster.gpg
+    - name: Package repository
+      ansible.builtin.apt_repository:
+        repo: deb https://pkgs.tailscale.com/stable/raspbian buster main
+      notify: 
+        - Apt update
+    - name: Install tailscale
+      ansible.builtin.apt:
+        pkg:
+          - tailscale
+    - name: Service tailscale run
+      ansible.builtin.systemd:
+        name: tailscaled
+        enabled: yes
+        state: started
+    - name: Run tailscale
+      ansible.builtin.shell:
+        cmd: tailscale up --auth-key "{{ tailscale_auth_key }}"
+    - name: Tailscale ip
+      ansible.builtin.shell:
+        cmd: tailscale ip -4
+      register: command_output
+    - ansible.builtin.debug:
+        var: command_output.stdout_lines
+  handlers:
+    - name: Apt update
+      apt:
+        update_cache: yes
+        install_recommends: no
+    
