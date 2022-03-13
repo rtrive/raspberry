@@ -1,7 +1,7 @@
 ---
 - name: Initial setup
   hosts: raspberry
-  vars_files: ./vars/global.yaml
+  vars_files: ../vars/global.yaml
   become: yes
   tasks:
     - name: Apt update

@@ -1,7 +1,7 @@
 ---
 - name: Tailscale
   hosts: raspberry
-  vars_files: ./vars/global.yaml
+  vars_files: ../vars/global.yaml
   become: yes
   tasks:
     - name: Install apt-transport-https
